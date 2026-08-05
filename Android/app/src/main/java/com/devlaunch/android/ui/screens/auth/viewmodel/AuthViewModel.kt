@@ -1,15 +1,45 @@
 package com.devlaunch.android.ui.screens.auth.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.devlaunch.android.ui.screens.auth.model.AuthState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import androidx.lifecycle.viewModelScope
+import com.devlaunch.android.core.network.SupabaseClientProvider
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.providers.builtin.Email
+import kotlinx.coroutines.launch
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 class AuthViewModel : ViewModel() {
 
+    private fun isValidEmail(email: String): Boolean {
+        return android.util.Patterns.EMAIL_ADDRESS
+            .matcher(email)
+            .matches()
+    }
+
+    private fun isValidPassword(password: String): Boolean {
+        val passwordRegex =
+            Regex("^(?=.*[A-Za-z])(?=.*\\d).{8,}$")
+
+        return passwordRegex.matches(password)
+    }
+
+
     private val _state = MutableStateFlow(AuthState())
     val state: StateFlow<AuthState> = _state.asStateFlow()
+
+    fun onFullNameChanged(name: String) {
+        _state.value = _state.value.copy(
+            fullName = name,
+            fullNameError = null
+        )
+    }
+
 
     // ---------------- Login ----------------
 
@@ -53,29 +83,101 @@ class AuthViewModel : ViewModel() {
     // ---------------- Login ----------------
 
     fun login() {
+        _state.value = _state.value.copy(
+            emailError = null,
+            passwordError = null,
+            error = null
+        )
 
         if (_state.value.email.isBlank()) {
-
             _state.value = _state.value.copy(
                 emailError = "Email is required"
             )
             return
         }
+        if (!isValidEmail(_state.value.email)) {
+
+            _state.value = _state.value.copy(
+                emailError = "Enter a valid email address"
+            )
+            return
+        }
 
         if (_state.value.password.isBlank()) {
-
             _state.value = _state.value.copy(
                 passwordError = "Password is required"
             )
             return
         }
 
-        // Firebase Login नंतर इथे येईल
+        if (!isValidPassword(_state.value.password)) {
+
+            _state.value = _state.value.copy(
+                passwordError = "Password must contain at least 8 characters, letters and numbers"
+            )
+            return
+        }
+
+        viewModelScope.launch {
+
+            _state.value = _state.value.copy(
+                isLoading = true,
+                error = null
+            )
+
+            try {
+
+                SupabaseClientProvider.client.auth.signInWith(Email) {
+
+                    email = _state.value.email
+                    password = _state.value.password
+
+                }
+
+                _state.value = _state.value.copy(
+                    isLoading = false
+                )
+
+                // TODO: Navigate to Home Screen
+
+            } catch (e: Exception) {
+
+                Log.e("Login", e.stackTraceToString())
+
+                val message = when {
+
+                    e.message?.contains("invalid_credentials", true) == true ->
+                        "Invalid email or password."
+
+                    e.message?.contains("network", true) == true ||
+                            e.message?.contains("unable to resolve host", true) == true ->
+                        "Please check your internet connection."
+
+                    else ->
+                        "Something went wrong. Please try again."
+                }
+
+                _state.value = _state.value.copy(
+                    isLoading = false,
+                    error = message
+                )
+            }
+        }
+
     }
 
     // ---------------- Signup ----------------
 
+
+
     fun signup() {
+
+        if (_state.value.fullName.isBlank()) {
+            _state.value = _state.value.copy(
+                fullNameError = "Full name is required"
+            )
+            return
+        }
 
         if (_state.value.signupEmail.isBlank()) {
 
@@ -100,6 +202,14 @@ class AuthViewModel : ViewModel() {
             )
             return
         }
+        if (!isValidPassword(_state.value.signupPassword)) {
+
+            _state.value = _state.value.copy(
+                signupPasswordError =
+                    "Password must contain at least 8 characters, letters and numbers"
+            )
+            return
+        }
 
         if (_state.value.signupPassword != _state.value.confirmPassword) {
 
@@ -111,7 +221,52 @@ class AuthViewModel : ViewModel() {
 
 
 
-        // Firebase Signup नंतर इथे येईल
+        viewModelScope.launch {
+
+            _state.value = _state.value.copy(
+                isLoading = true,
+                error = null
+            )
+
+            try {
+
+                SupabaseClientProvider.client.auth.signUpWith(Email) {
+
+                    email = _state.value.signupEmail
+                    password = _state.value.signupPassword
+
+                    data = buildJsonObject {
+                        put("full_name", _state.value.fullName)
+                    }
+                }
+
+                _state.value = _state.value.copy(
+                    isLoading = false,
+                    error = "Account created successfully."
+                )
+
+            } catch (e: Exception) {
+
+                Log.e("Signup", e.stackTraceToString())
+
+                val message = when {
+
+                    e.message?.contains("already registered", true) == true ->
+                        "This email is already registered."
+
+                    e.message?.contains("email", true) == true ->
+                        "Please enter a valid email."
+
+                    else ->
+                        "Unable to create account. Please try again."
+                }
+
+                _state.value = _state.value.copy(
+                    isLoading = false,
+                    error = message
+                )
+            }
+        }
     }
 
     // ---------------- Forgot Password ----------------

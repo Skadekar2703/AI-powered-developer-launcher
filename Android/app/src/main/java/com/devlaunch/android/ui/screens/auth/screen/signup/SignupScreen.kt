@@ -35,6 +35,7 @@ import com.devlaunch.android.ui.screens.auth.model.AuthState
 @Composable
 fun SignupScreen(
     state: AuthState,
+    onFullNameChanged: (String) -> Unit,
     onEmailChanged: (String) -> Unit,
     onPasswordChanged: (String) -> Unit,
     onConfirmPasswordChanged: (String) -> Unit,
@@ -73,6 +74,17 @@ fun SignupScreen(
             )
 
             Spacer(modifier = Modifier.height(32.dp))
+
+            DevTextField(
+                value = state.fullName,
+                onValueChange = onFullNameChanged,
+                label = "Full Name",
+                placeholder = "Your Name",
+                error = state.fullNameError,
+                enabled = !state.isLoading
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             DevTextField(
                 value = state.signupEmail,

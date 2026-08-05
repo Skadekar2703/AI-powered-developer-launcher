@@ -51,9 +51,7 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally
 
         ) {
-            Text(
-                text = state.email
-            )
+
             DevLogo(size = 52.dp)
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -68,7 +66,7 @@ fun LoginScreen(
             )
             Spacer(modifier = Modifier.height(6.dp))
             Text(
-                text = "Sign in to continue to DevLaunch.",
+                text = "Sign in to continue your DevLaunch.",
                 style = MaterialTheme.typography.bodyMedium.copy(
                     color = DevTextSecondary,
                     fontSize = 13.sp

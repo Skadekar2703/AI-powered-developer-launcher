@@ -28,4 +28,7 @@ data class AuthState(
     val forgotEmailError: String? = null,
     val forgotSuccessMessage: String? = null,
 
+    val fullName: String = "",
+    val fullNameError: String? = null,
+
 )

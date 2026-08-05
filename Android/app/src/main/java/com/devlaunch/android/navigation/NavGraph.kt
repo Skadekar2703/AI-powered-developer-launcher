@@ -62,6 +62,8 @@ fun AppNavGraph() {
 
                 state = state,
 
+                onFullNameChanged = viewModel::onFullNameChanged,
+
                 onEmailChanged = viewModel::onSignupEmailChanged,
 
                 onPasswordChanged = viewModel::onSignupPasswordChanged,
@@ -75,7 +77,6 @@ fun AppNavGraph() {
                 onLoginClick = {
                     navController.popBackStack()
                 }
-
             )
 
         }

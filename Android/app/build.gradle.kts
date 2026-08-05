@@ -16,6 +16,18 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField(
+            "String",
+            "SUPABASE_URL",
+            "\"${project.findProperty("SUPABASE_URL")}\""
+        )
+
+        buildConfigField(
+            "String",
+            "SUPABASE_KEY",
+            "\"${project.findProperty("SUPABASE_KEY")}\""
+        )
     }
 
     buildTypes {
@@ -39,6 +51,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -64,5 +77,13 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
+
+    implementation(libs.supabase.auth)
+    implementation(libs.supabase.postgrest)
+    implementation(libs.supabase.realtime)
+    implementation(libs.supabase.storage)
+    implementation(libs.supabase.compose.auth)
+
+    implementation(libs.ktor.client.okhttp)
 
 }
