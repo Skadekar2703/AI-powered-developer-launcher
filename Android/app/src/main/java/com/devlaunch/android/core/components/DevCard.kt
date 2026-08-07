@@ -9,6 +9,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.devlaunch.android.ui.theme.DevBorder
 import com.devlaunch.android.ui.theme.DevSurface
@@ -28,8 +29,10 @@ fun DevCard(
         shape = RoundedCornerShape(22.dp),
 
         colors = CardDefaults.cardColors(
-            containerColor = DevSurface
+            containerColor = Color(0xFFF3F4F6)
         ),
+
+
 
         border = BorderStroke(
             1.dp,
@@ -37,14 +40,14 @@ fun DevCard(
         ),
 
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 8.dp
+            defaultElevation = 10.dp
         )
 
     ) {
 
         Column(
 
-            modifier = Modifier.padding(20.dp),
+            modifier = Modifier.padding(10.dp),
 
             content = content
 

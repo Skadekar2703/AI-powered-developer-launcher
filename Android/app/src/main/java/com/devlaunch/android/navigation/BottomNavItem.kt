@@ -2,11 +2,11 @@ package com.devlaunch.android.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
-import androidx.compose.material.icons.outlined.Chat
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.material.icons.automirrored.outlined.Chat
 
 sealed class BottomNavItem(
 
@@ -31,7 +31,7 @@ sealed class BottomNavItem(
     object AI : BottomNavItem(
         route = "ai",
         title = "AI",
-        icon = Icons.Outlined.Chat
+        Icons.AutoMirrored.Outlined.Chat
     )
 
     object Notifications : BottomNavItem(

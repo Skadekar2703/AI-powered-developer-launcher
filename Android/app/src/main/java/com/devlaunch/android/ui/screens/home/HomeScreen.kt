@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -17,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.devlaunch.android.ui.screens.home.components.AIAssistantCard
 import com.devlaunch.android.ui.screens.home.components.GitHubCard
 import com.devlaunch.android.ui.screens.home.components.GreetingSection
+import com.devlaunch.android.ui.screens.home.components.HomeBottomBar
 import com.devlaunch.android.ui.screens.home.components.QuickActionsSection
 import com.devlaunch.android.ui.screens.home.components.RecentActivitySection
 import com.devlaunch.android.ui.screens.home.components.RecentProjectsSection
@@ -24,65 +27,96 @@ import com.devlaunch.android.ui.screens.home.components.SearchBarSection
 import com.devlaunch.android.ui.screens.home.components.WorkspaceStatsSection
 import com.devlaunch.android.ui.theme.DevBackground
 
+
 @Composable
 fun HomeScreen() {
 
     var search by remember { mutableStateOf("") }
+    var selectedRoute by remember { mutableStateOf("home") }
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(DevBackground)
-            .padding(horizontal = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
-    ) {
+    Scaffold(
 
-        item {
-            Spacer(modifier = Modifier.height(28.dp))
-            GreetingSection(
-                userName = "Vishal",
-                greeting = "Good Morning",
-                pendingItems = 3
+        containerColor = MaterialTheme.colorScheme.background,
+
+        bottomBar = {
+
+            HomeBottomBar(
+
+                selectedRoute = selectedRoute,
+
+                onItemClick = {
+                    selectedRoute = it.route
+                }
+
             )
+
         }
 
-        item {
-            SearchBarSection(
-                value = search,
-                onValueChange = { search = it }
-            )
+    ) { innerPadding ->
+
+        LazyColumn(
+
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(innerPadding)          // 👈 महत्त्वाचं
+                .padding(horizontal = 20.dp),
+
+            verticalArrangement = Arrangement.spacedBy(24.dp)
+
+        ) {
+
+            item {
+                Spacer(modifier = Modifier.height(50.dp))
+
+                GreetingSection(
+                    userName = "Vishal",
+                    greeting = "Welcome Back",
+                    pendingItems = 3
+                )
+            }
+
+            item {
+                SearchBarSection(
+                    value = search,
+                    onValueChange = { search = it }
+                )
+            }
+
+            item {
+                GitHubCard(onClick = { })
+            }
+
+            item {
+                AIAssistantCard(onClick = { })
+            }
+
+            item {
+                QuickActionsSection(
+                    onAddTask = { },
+                    onNewProject = { },
+                    onAiChat = { }
+                )
+            }
+
+            item {
+                WorkspaceStatsSection()
+            }
+
+            item {
+                RecentProjectsSection(onProjectClick = { })
+            }
+
+            item {
+                RecentActivitySection()
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+
         }
 
-        item {
-            GitHubCard(onClick = { /* navigate to GitHub screen */ })
-        }
-
-        item {
-            AIAssistantCard(onClick = { /* open AI assistant */ })
-        }
-
-        item {
-            QuickActionsSection(
-                onAddTask = { },
-                onNewProject = { },
-                onAiChat = { }
-            )
-        }
-
-        item {
-            WorkspaceStatsSection()
-        }
-
-        item {
-            RecentProjectsSection(onProjectClick = { })
-        }
-
-        item {
-            RecentActivitySection()
-        }
-
-        item {
-            Spacer(modifier = Modifier.height(100.dp))
-        }
     }
+
 }

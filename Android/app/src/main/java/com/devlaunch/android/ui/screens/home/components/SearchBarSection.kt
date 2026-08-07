@@ -6,17 +6,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.devlaunch.android.ui.theme.DevBorder
-import com.devlaunch.android.ui.theme.DevPrimary
-import com.devlaunch.android.ui.theme.DevSurface
-import com.devlaunch.android.ui.theme.DevTextMuted
-import com.devlaunch.android.ui.theme.DevTextPrimary
 
 @Composable
 fun SearchBarSection(
@@ -40,8 +36,11 @@ fun SearchBarSection(
         placeholder = {
 
             Text(
-                "Search projects, AI, files...",
-                color = DevTextMuted
+
+                text = "Search projects, AI, files...",
+
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+
             )
 
         },
@@ -49,8 +48,11 @@ fun SearchBarSection(
         leadingIcon = {
 
             Icon(
+
                 imageVector = Icons.Outlined.Search,
+
                 contentDescription = null
+
             )
 
         },
@@ -61,21 +63,23 @@ fun SearchBarSection(
 
         colors = OutlinedTextFieldDefaults.colors(
 
-            focusedBorderColor = DevPrimary,
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
 
-            unfocusedBorderColor = DevBorder,
+            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
 
-            focusedContainerColor = DevSurface,
+            focusedContainerColor = MaterialTheme.colorScheme.surface,
 
-            unfocusedContainerColor = DevSurface,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
 
-            focusedTextColor = DevTextPrimary,
+            focusedTextColor = MaterialTheme.colorScheme.onSurface,
 
-            unfocusedTextColor = DevTextPrimary,
+            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
 
-            focusedLeadingIconColor = DevPrimary,
+            focusedLeadingIconColor = MaterialTheme.colorScheme.primary,
 
-            unfocusedLeadingIconColor = DevTextMuted
+            unfocusedLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+
+            cursorColor = MaterialTheme.colorScheme.primary
 
         )
 
