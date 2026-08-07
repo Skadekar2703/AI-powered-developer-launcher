@@ -29,7 +29,6 @@ class AuthViewModel : ViewModel() {
         return passwordRegex.matches(password)
     }
 
-
     private val _state = MutableStateFlow(AuthState())
     val state: StateFlow<AuthState> = _state.asStateFlow()
 
@@ -39,7 +38,6 @@ class AuthViewModel : ViewModel() {
             fullNameError = null
         )
     }
-
 
     // ---------------- Login ----------------
 
@@ -55,6 +53,75 @@ class AuthViewModel : ViewModel() {
             password = password,
             passwordError = null
         )
+    }
+
+    fun login(onSuccess: () -> Unit) {
+
+        _state.value = _state.value.copy(
+            emailError = null,
+            passwordError = null,
+            error = null
+        )
+
+        val email = _state.value.email.trim()
+        val password = _state.value.password.trim()
+
+        if (email.isBlank()) {
+            _state.value = _state.value.copy(emailError = "Email is required")
+            return
+        }
+        if (!isValidEmail(email)) {
+            _state.value = _state.value.copy(emailError = "Enter a valid email address")
+            return
+        }
+
+        if (password.isBlank()) {
+            _state.value = _state.value.copy(passwordError = "Password is required")
+            return
+        }
+        if (!isValidPassword(password)) {
+            _state.value = _state.value.copy(
+                passwordError = "Password must contain at least 8 characters, letters and numbers"
+            )
+            return
+        }
+
+        viewModelScope.launch {
+
+            _state.value = _state.value.copy(isLoading = true, error = null)
+
+            try {
+
+                SupabaseClientProvider.client.auth.signInWith(Email) {
+                    this.email = email
+                    this.password = password
+                }
+
+                _state.value = _state.value.copy(isLoading = false)
+
+                onSuccess()
+
+            } catch (e: Exception) {
+
+                Log.e("Login", e.stackTraceToString())
+
+                val message = when {
+                    e.message?.contains("invalid_credentials", true) == true ->
+                        "Invalid email or password."
+
+                    e.message?.contains("network", true) == true ||
+                            e.message?.contains("unable to resolve host", true) == true ->
+                        "Please check your internet connection."
+
+                    else -> "Something went wrong. Please try again."
+                }
+
+                _state.value = _state.value.copy(
+                    isLoading = false,
+                    error = message
+                )
+            }
+        }
     }
 
     // ---------------- Signup ----------------
@@ -80,169 +147,67 @@ class AuthViewModel : ViewModel() {
         )
     }
 
-    // ---------------- Login ----------------
-
-    fun login() {
-        _state.value = _state.value.copy(
-            emailError = null,
-            passwordError = null,
-            error = null
-        )
-
-        if (_state.value.email.isBlank()) {
-            _state.value = _state.value.copy(
-                emailError = "Email is required"
-            )
-            return
-        }
-        if (!isValidEmail(_state.value.email)) {
-
-            _state.value = _state.value.copy(
-                emailError = "Enter a valid email address"
-            )
-            return
-        }
-
-        if (_state.value.password.isBlank()) {
-            _state.value = _state.value.copy(
-                passwordError = "Password is required"
-            )
-            return
-        }
-
-        if (!isValidPassword(_state.value.password)) {
-
-            _state.value = _state.value.copy(
-                passwordError = "Password must contain at least 8 characters, letters and numbers"
-            )
-            return
-        }
-
-        viewModelScope.launch {
-
-            _state.value = _state.value.copy(
-                isLoading = true,
-                error = null
-            )
-
-            try {
-
-                SupabaseClientProvider.client.auth.signInWith(Email) {
-
-                    email = _state.value.email
-                    password = _state.value.password
-
-                }
-
-                _state.value = _state.value.copy(
-                    isLoading = false
-                )
-
-                // TODO: Navigate to Home Screen
-
-            } catch (e: Exception) {
-
-                Log.e("Login", e.stackTraceToString())
-
-                val message = when {
-
-                    e.message?.contains("invalid_credentials", true) == true ->
-                        "Invalid email or password."
-
-                    e.message?.contains("network", true) == true ||
-                            e.message?.contains("unable to resolve host", true) == true ->
-                        "Please check your internet connection."
-
-                    else ->
-                        "Something went wrong. Please try again."
-                }
-
-                _state.value = _state.value.copy(
-                    isLoading = false,
-                    error = message
-                )
-            }
-        }
-
-    }
-
-    // ---------------- Signup ----------------
-
-
-
     fun signup() {
 
-        if (_state.value.fullName.isBlank()) {
+        val fullName = _state.value.fullName.trim()
+        val email = _state.value.signupEmail.trim()
+        val password = _state.value.signupPassword.trim()
+        val confirmPassword = _state.value.confirmPassword.trim()
+
+        if (fullName.isBlank()) {
+            _state.value = _state.value.copy(fullNameError = "Full name is required")
+            return
+        }
+
+        if (email.isBlank()) {
+            _state.value = _state.value.copy(signupEmailError = "Email is required")
+            return
+        }
+        if (!isValidEmail(email)) {
+            _state.value = _state.value.copy(signupEmailError = "Enter a valid email address")
+            return
+        }
+
+        if (password.isBlank()) {
+            _state.value = _state.value.copy(signupPasswordError = "Password is required")
+            return
+        }
+
+        if (confirmPassword.isBlank()) {
+            _state.value = _state.value.copy(confirmPasswordError = "Confirm Password is required")
+            return
+        }
+
+        if (!isValidPassword(password)) {
             _state.value = _state.value.copy(
-                fullNameError = "Full name is required"
+                signupPasswordError = "Password must contain at least 8 characters, letters and numbers"
             )
             return
         }
 
-        if (_state.value.signupEmail.isBlank()) {
-
-            _state.value = _state.value.copy(
-                signupEmailError = "Email is required"
-            )
+        if (password != confirmPassword) {
+            _state.value = _state.value.copy(confirmPasswordError = "Passwords do not match")
             return
         }
-
-        if (_state.value.signupPassword.isBlank()) {
-
-            _state.value = _state.value.copy(
-                signupPasswordError = "Password is required"
-            )
-            return
-        }
-
-        if (_state.value.confirmPassword.isBlank()) {
-
-            _state.value = _state.value.copy(
-                confirmPasswordError = "Confirm Password is required"
-            )
-            return
-        }
-        if (!isValidPassword(_state.value.signupPassword)) {
-
-            _state.value = _state.value.copy(
-                signupPasswordError =
-                    "Password must contain at least 8 characters, letters and numbers"
-            )
-            return
-        }
-
-        if (_state.value.signupPassword != _state.value.confirmPassword) {
-
-            _state.value = _state.value.copy(
-                confirmPasswordError = "Passwords do not match"
-            )
-            return
-        }
-
-
 
         viewModelScope.launch {
 
-            _state.value = _state.value.copy(
-                isLoading = true,
-                error = null
-            )
+            _state.value = _state.value.copy(isLoading = true, error = null)
 
             try {
 
                 SupabaseClientProvider.client.auth.signUpWith(Email) {
-
-                    email = _state.value.signupEmail
-                    password = _state.value.signupPassword
+                    this.email = email
+                    this.password = password
 
                     data = buildJsonObject {
-                        put("full_name", _state.value.fullName)
+                        put("full_name", fullName)
                     }
                 }
 
                 _state.value = _state.value.copy(
                     isLoading = false,
-                    error = "Account created successfully."
+                    successMessage = "Account created successfully."
                 )
 
             } catch (e: Exception) {
@@ -250,15 +215,13 @@ class AuthViewModel : ViewModel() {
                 Log.e("Signup", e.stackTraceToString())
 
                 val message = when {
-
                     e.message?.contains("already registered", true) == true ->
                         "This email is already registered."
 
                     e.message?.contains("email", true) == true ->
                         "Please enter a valid email."
 
-                    else ->
-                        "Unable to create account. Please try again."
+                    else -> "Unable to create account. Please try again."
                 }
 
                 _state.value = _state.value.copy(
@@ -272,30 +235,61 @@ class AuthViewModel : ViewModel() {
     // ---------------- Forgot Password ----------------
 
     fun onForgotEmailChanged(email: String) {
-
         _state.value = _state.value.copy(
             forgotEmail = email,
             forgotEmailError = null,
             forgotSuccessMessage = null
         )
-
     }
 
     fun resetPassword() {
 
-        if (_state.value.forgotEmail.isBlank()) {
+        val email = _state.value.forgotEmail.trim()
 
-            _state.value = _state.value.copy(
-                forgotEmailError = "Email is required"
-            )
-
+        if (email.isBlank()) {
+            _state.value = _state.value.copy(forgotEmailError = "Email is required")
             return
         }
 
-        _state.value = _state.value.copy(
-            forgotSuccessMessage = "Password reset link has been sent to ${_state.value.forgotEmail}"
-        )
+        if (!isValidEmail(email)) {
+            _state.value = _state.value.copy(forgotEmailError = "Enter a valid email address")
+            return
+        }
 
+        viewModelScope.launch {
+
+            _state.value = _state.value.copy(
+                isLoading = true,
+                forgotEmailError = null,
+                forgotSuccessMessage = null
+            )
+
+            try {
+
+                SupabaseClientProvider.client.auth.resetPasswordForEmail(email)
+
+                _state.value = _state.value.copy(
+                    isLoading = false,
+                    forgotSuccessMessage = "Password reset link has been sent to $email"
+                )
+
+            } catch (e: Exception) {
+
+                Log.e("ResetPassword", e.stackTraceToString())
+
+                val message = when {
+                    e.message?.contains("network", true) == true ||
+                            e.message?.contains("unable to resolve host", true) == true ->
+                        "Please check your internet connection."
+
+                    else -> "Unable to send reset link. Please try again."
+                }
+
+                _state.value = _state.value.copy(
+                    isLoading = false,
+                    forgotEmailError = message
+                )
+            }
+        }
     }
-
 }

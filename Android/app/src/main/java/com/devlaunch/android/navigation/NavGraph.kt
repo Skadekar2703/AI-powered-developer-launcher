@@ -10,7 +10,13 @@ import com.devlaunch.android.ui.screens.auth.screen.signup.SignupScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import com.devlaunch.android.ui.screens.home.HomeScreen
 import com.devlaunch.android.ui.screens.auth.viewmodel.AuthViewModel
+import com.devlaunch.android.ui.screens.projects.ProjectsScreen
+import com.devlaunch.android.ui.screens.profile.ProfileScreen
+import com.devlaunch.android.ui.screens.ai.AiScreen
+import com.devlaunch.android.ui.screens.main.MainScreen
+import com.devlaunch.android.ui.screens.notification.NotificationScreen
 
 
 
@@ -29,31 +35,41 @@ fun AppNavGraph() {
     ) {
 
 
+        composable(Screen.Login.route) {
 
-            composable(Screen.Login.route) {
+            LoginScreen(
 
-                LoginScreen(
 
-                    state = state,
+                state = state,
 
-                    onEmailChanged = viewModel::onEmailChanged,
+                onEmailChanged = viewModel::onEmailChanged,
 
-                    onPasswordChanged = viewModel::onPasswordChanged,
+                onPasswordChanged = viewModel::onPasswordChanged,
 
-                    onLoginClick = viewModel::login,
-
-                    onGoogleClick = {},
-
-                    onForgotPasswordClick = {
-                        navController.navigate(Screen.ForgotPassword.route)
-                    },
-
-                    onCreateAccountClick = {
-                        navController.navigate(Screen.Signup.route)
+                onLoginClick = {
+                    viewModel.login {
+                        navController.navigate(Screen.Main.route) {
+                            popUpTo(Screen.Login.route) {
+                                inclusive = true
+                            }
+                        }
                     }
+                },
 
-                )
-            }
+                onGoogleClick = {},
+
+                onForgotPasswordClick = {
+                    navController.navigate(Screen.ForgotPassword.route)
+                },
+
+                onCreateAccountClick = {
+                    navController.navigate(Screen.Signup.route)
+                }
+
+            )
+
+        }
+
 
 
         composable(Screen.Signup.route) {
@@ -97,6 +113,30 @@ fun AppNavGraph() {
 
             )
 
+        }
+
+        composable(Screen.Main.route) {
+            MainScreen(navController)
+        }
+
+        composable(Screen.Home.route) {
+            HomeScreen()
+        }
+
+        composable(Screen.Projects.route) {
+            ProjectsScreen()
+        }
+
+        composable(Screen.AI.route) {
+            AiScreen()
+        }
+
+        composable(Screen.Notifications.route) {
+            NotificationScreen()
+        }
+
+        composable(Screen.Profile.route) {
+            ProfileScreen()
         }
 
     }

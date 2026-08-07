@@ -9,5 +9,10 @@ object Routes {
     const val SIGNUP = "signup"
 
     const val HOME = "home"
+    const val MAIN = "main"
+    const val PROJECTS = "projects"
+    const val AI = "ai"
+    const val NOTIFICATIONS = "notifications"
+    const val PROFILE = "profile"
 
 }

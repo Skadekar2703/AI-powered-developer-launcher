@@ -30,5 +30,6 @@ data class AuthState(
 
     val fullName: String = "",
     val fullNameError: String? = null,
+    val successMessage: String? = null
 
 )

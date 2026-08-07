@@ -32,6 +32,33 @@ private val LightColorScheme = lightColorScheme(
     onSurface = Color(0xFF1C1B1F),
     */
 )
+private val LightColors = lightColorScheme(
+    primary = DevLightPrimary,
+    background = DevLightBackground,
+    surface = DevLightSurface
+)
+
+private val DarkColors = darkColorScheme(
+    primary = DevDarkPrimary,
+    background = DevDarkBackground,
+    surface = DevDarkSurface
+)
+
+@Composable
+fun DevLaunchTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -> Unit
+) {
+
+    MaterialTheme(
+
+        colorScheme = if (darkTheme) DarkColors else LightColors,
+
+        content = content
+
+    )
+
+}
 
 @Composable
 fun DevLaunchAndroidTheme(
@@ -55,4 +82,6 @@ fun DevLaunchAndroidTheme(
         typography = Typography,
         content = content
     )
+
+
 }

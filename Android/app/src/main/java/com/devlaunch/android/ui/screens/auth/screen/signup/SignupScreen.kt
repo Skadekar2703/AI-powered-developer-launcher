@@ -189,12 +189,6 @@ fun SignupScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
-
-            DevGoogleButton(
-                onClick = onGoogleClick,
-                modifier = Modifier.fillMaxWidth()
-            )
 
             Spacer(modifier = Modifier.height(32.dp))
 
